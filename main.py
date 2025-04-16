@@ -123,6 +123,9 @@ Instructies:
 - Vermeld altijd de datum van het besluit en het kenmerk, indien deze uit het document gehaald kunnen worden.
 - Analyseer relevante wetsartikelen die genoemd worden in het besluit.
 - Reageer inhoudelijk op die wetsartikelen vanuit het perspectief van de indiener.
+- Neem de letterlijke wettekst op in het bezwaarschrift wanneer deze in het besluit of het dossier wordt genoemd.
+- Pas altijd het evenredigheidsbeginsel toe, ook bij schending van de inlichtingenplicht of bij twijfel over betalingsonmacht.
+- Beoordeel expliciet het evenredigheidsbeginsel aan de hand van de drie criteria: geschiktheid, noodzakelijkheid en evenwichtigheid, en geef bij elk criterium een aparte onderbouwing.
 - Controleer of fundamentele rechtsbeginselen zijn geschonden (zoals het zorgvuldigheidsbeginsel, evenredigheidsbeginsel, motiveringsbeginsel).
 - Vermeld expliciet dat de indiener verzoekt om toezending van het volledige dossier.
 - Sluit het bezwaarschrift correct af met de naam van de indiener en ruimte voor handtekening.
