@@ -95,20 +95,10 @@ def extract_text_from_image(file_stream):
     return pytesseract.image_to_string(image, lang='nld')
 
 def generate_bezwaarschrift(gegevens, bestandstekst):
-    try:
-        with open("juridische_basis.txt", "r", encoding="utf-8") as f:
-            juridische_basis = f.read()
-    except FileNotFoundError:
-        juridische_basis = ""
-
     prompt = f"""
-Gebruik de volgende juridische bepalingen letterlijk waar relevant. Verwijs ernaar en neem de volledige tekst indien mogelijk op in het bezwaarschrift. Het eindresultaat moet minimaal 1,5 A4 lang zijn (ongeveer 1000–1200 woorden).
-
-{juridische_basis}
-
 Je bent een juridisch medewerker. Op basis van onderstaande informatie dien je een juridisch correct en volledig bezwaarschrift op te stellen. Gebruik duidelijke alinea's, formele toon, en géén Markdown-opmaak zoals ### of lijsten.
 
-Voer eerst een juridische analyse uit. Onderzoek vervolgens of de genoemde wetsartikelen correct zijn toegepast. Werk daarna pas het bezwaarschrift volledig uit. Geef motivering per artikel.
+Voer eerst een juridische analyse uit. Onderzoek vervolgens of de genoemde wetsartikelen correct zijn toegepast. Werk daarna pas het bezwaarschrift volledig uit. Geef motivering per artikel. Het eindresultaat moet minimaal 1.000 woorden bevatten.
 
 Persoonsgegevens:
 Naam: {gegevens['voornaam']} {gegevens['achternaam']}
@@ -127,20 +117,18 @@ Eventuele extra toelichting van de gebruiker:
 
 Stel nu een bezwaarschrift op waarin je:
 - Altijd de datum en het kenmerk van het besluit noemt indien beschikbaar.
-- Relevante wetsartikelen inhoudelijk analyseert en waar nodig letterlijk opneemt.
+- Relevante wetsartikelen inhoudelijk analyseert (zonder letterlijke overname).
 - Het evenredigheidsbeginsel toepast, ook bij schending van de inlichtingenplicht of twijfel over betalingsonmacht.
 - De drie onderdelen van het evenredigheidsbeginsel afzonderlijk bespreekt: geschiktheid, noodzakelijkheid en evenwichtigheid.
 - Eventuele schending van andere rechtsbeginselen benoemt (zorgvuldigheid, motivering, proportionaliteit).
 - Vermeldt dat de indiener het volledige dossier wil ontvangen.
 - Afsluit met naam van de indiener en ruimte voor handtekening.
-
-Het bezwaarschrift moet juridisch goed onderbouwd, helder, overtuigend en minstens 1,5 A4 lang zijn.
 """
 
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt. Je redeneert stap voor stap, gebruikt letterlijke wetteksten waar genoemd, en structureert je antwoord in formele paragrafen. Het eindresultaat is lang, onderbouwd en foutloos."},
+            {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt. Je redeneert stap voor stap, structureert je antwoord in formele paragrafen en zorgt voor heldere argumentatie."},
             {"role": "user", "content": prompt}
         ]
     )
