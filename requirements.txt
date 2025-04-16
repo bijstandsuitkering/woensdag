@@ -1,0 +1,6 @@
+Flask
+openai
+PyMuPDF
+pytesseract
+Pillow
+fpdf
