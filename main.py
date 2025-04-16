@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string, send_file
+from flask import Flask, request, render_template_string
 import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
@@ -6,8 +6,6 @@ import openai
 import io
 import os
 from dotenv import load_dotenv
-from fpdf import FPDF
-import textwrap
 
 # Laad de .env file
 load_dotenv()
@@ -64,10 +62,6 @@ HTML = """
 <hr>
 <h2>Resultaat:</h2>
 <div class="result-box" id="resultBox">{{ result }}</div>
-<form method="post" action="/download">
-  <input type="hidden" name="tekst" value="{{ result | tojson | safe }}">
-  <button type="submit">Download als PDF</button>
-</form>
 <button class="copy-button" onclick="copyToClipboard()">Kopieer tekst</button>
 <script>
 function copyToClipboard() {
@@ -101,6 +95,12 @@ def extract_text_from_image(file_stream):
     return pytesseract.image_to_string(image, lang='nld')
 
 def generate_bezwaarschrift(gegevens, bestandstekst):
+    try:
+        with open("juridische_basis.txt", "r", encoding="utf-8") as f:
+            juridische_basis = f.read()
+    except FileNotFoundError:
+        juridische_basis = ""
+
     prompt = f"""
 Je bent een juridisch medewerker. Schrijf een bezwaarschrift aan de gemeente op basis van de volgende informatie:
 
@@ -127,8 +127,10 @@ Instructies:
 - Vermeld expliciet dat de indiener verzoekt om toezending van het volledige dossier.
 - Sluit het bezwaarschrift correct af met de naam van de indiener en ruimte voor handtekening.
 - Zorg dat het bezwaarschrift duidelijk, formeel en juridisch kloppend is.
-"""
 
+Hieronder volgt aanvullende juridische achtergrondinformatie:
+{juridische_basis}
+"""
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -164,23 +166,6 @@ def index():
             result = generate_bezwaarschrift(gegevens, text)
 
     return render_template_string(HTML, result=result)
-
-@app.route('/download', methods=['POST'])
-def download_pdf():
-    tekst = request.form['tekst']
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=12)
-    for paragraph in tekst.split('\n\n'):
-        lines = textwrap.wrap(paragraph.strip(), width=90)
-        for line in lines:
-            pdf.multi_cell(0, 10, line)
-        pdf.ln()
-    pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    return send_file(pdf_output, as_attachment=True, download_name="bezwaarschrift.pdf", mimetype='application/pdf')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=10000)
