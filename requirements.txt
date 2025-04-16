@@ -4,4 +4,5 @@ PyMuPDF
 pytesseract
 Pillow
 fpdf
-python-dotenv  # Toegevoegd voor het laden van de API-sleutel uit .env
+python-dotenv
+gunicorn
