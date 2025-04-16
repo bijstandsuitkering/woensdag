@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 from fpdf import FPDF
 import textwrap
 
-# Load the .env file
+# Laad de .env file
 load_dotenv()
 
-# Get the API key from the environment variable
+# Haal de API key uit de omgeving
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
@@ -25,6 +25,12 @@ HTML = """
   <title>Bezwaarschrift Generator</title>
   <style>
     body { font-family: sans-serif; margin: 2em; }
+    form input[type="text"], form input[type="date"] {
+      width: 300px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    textarea { width: 600px; }
     .result-box {
       background: #f4f4f4;
       padding: 1em;
@@ -40,18 +46,18 @@ HTML = """
 </head>
 <body>
 <h1>Genereer je bezwaarschrift</h1>
-<form method="post" enctype="multipart/form-data">
-  <label>Voornaam: <input type="text" name="voornaam" required></label><br>
-  <label>Achternaam: <input type="text" name="achternaam" required></label><br>
-  <label>Adres: <input type="text" name="adres" required></label><br>
-  <label>Postcode: <input type="text" name="postcode" required></label><br>
-  <label>Plaats: <input type="text" name="plaats" required></label><br>
-  <label>Geboortedatum: <input type="date" name="geboortedatum" required></label><br>
-  <label>Datum van besluit: <input type="date" name="datum_besluit" required></label><br>
-  <label>Wat is er gebeurd? <br><textarea name="gebeurtenis" rows="4" cols="50" required></textarea></label><br><br>
-  <label>Optionele toelichting: <br><textarea name="toelichting" rows="4" cols="50"></textarea></label><br><br>
-  <label>Upload een PDF of foto: <input type="file" name="file" required></label><br><br>
-  <input type="submit" value="Genereer">
+<form method=post enctype=multipart/form-data>
+  <label>Voornaam: <input type=text name=voornaam required></label>
+  <label>Achternaam: <input type=text name=achternaam required></label>
+  <label>Adres: <input type=text name=adres required></label>
+  <label>Postcode: <input type=text name=postcode required></label>
+  <label>Plaats: <input type=text name=plaats required></label>
+  <label>Geboortedatum: <input type=date name=geboortedatum required></label>
+  <label>Datum van het besluit: <input type=date name=besluitdatum required></label><br>
+  <label>Wat is er gebeurd? <br><textarea name=gebeurtenis rows=4 required></textarea></label><br>
+  <label>Optionele toelichting: <br><textarea name=toelichting rows=4></textarea></label><br>
+  <label>Upload een PDF of foto: <input type=file name=file required></label><br><br>
+  <input type=submit value=Genereer>
 </form>
 
 {% if result %}
@@ -84,7 +90,6 @@ def extract_text_from_pdf(file_stream):
     for page in pdf:
         page_text = page.get_text()
         if not page_text.strip():
-            # Geen tekst gevonden, probeer OCR op afbeelding van pagina
             pix = page.get_pixmap(dpi=300)
             image = Image.open(io.BytesIO(pix.tobytes("png")))
             page_text = pytesseract.image_to_string(image, lang='nld')
@@ -100,14 +105,10 @@ def generate_bezwaarschrift(gegevens, bestandstekst):
 Je bent een juridisch medewerker. Schrijf een bezwaarschrift aan de gemeente op basis van de volgende informatie:
 
 Persoonsgegevens:
-Voornaam: {gegevens['voornaam']}
-Achternaam: {gegevens['achternaam']}
-Adres: {gegevens['adres']}
-Postcode: {gegevens['postcode']}
-Plaats: {gegevens['plaats']}
+Naam: {gegevens['voornaam']} {gegevens['achternaam']}
+Adres: {gegevens['adres']}, {gegevens['postcode']} {gegevens['plaats']}
 Geboortedatum: {gegevens['geboortedatum']}
-
-Datum van besluit: {gegevens['datum_besluit']}
+Datum van besluit: {gegevens['besluitdatum']}
 
 Beschrijving van de gebeurtenis:
 {gegevens['gebeurtenis']}
@@ -129,13 +130,13 @@ Instructies:
 """
 
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt."},
             {"role": "user", "content": prompt}
         ]
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -148,7 +149,7 @@ def index():
             'postcode': request.form['postcode'],
             'plaats': request.form['plaats'],
             'geboortedatum': request.form['geboortedatum'],
-            'datum_besluit': request.form['datum_besluit'],
+            'besluitdatum': request.form['besluitdatum'],
             'gebeurtenis': request.form['gebeurtenis'],
             'toelichting': request.form.get('toelichting', '')
         }
