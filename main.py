@@ -98,7 +98,7 @@ def generate_bezwaarschrift(gegevens, bestandstekst):
     prompt = f"""
 Je bent een juridisch medewerker. Op basis van onderstaande informatie dien je een juridisch correct en volledig bezwaarschrift op te stellen. Gebruik duidelijke alinea's, formele toon, en géén Markdown-opmaak zoals ### of lijsten.
 
-Voer eerst een juridische analyse uit. Onderzoek vervolgens of de genoemde wetsartikelen correct zijn toegepast. Werk daarna pas het bezwaarschrift volledig uit. Geef motivering per artikel. Het eindresultaat moet minimaal 1.000 woorden bevatten.
+Begin direct met het bezwaarschrift zelf, geadresseerd aan de juiste instantie, met formele aanhef en correcte opbouw. Verwerk de juridische analyse, overwegingen en argumenten daarin, niet als losstaand deel ervoor. Werk het bezwaar volledig uit in heldere, formele taal. Zorg voor een vloeiende tekststructuur. Gebruik minstens 1000 woorden.
 
 Persoonsgegevens:
 Naam: {gegevens['voornaam']} {gegevens['achternaam']}
