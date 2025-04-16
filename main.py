@@ -5,11 +5,15 @@ from PIL import Image
 import openai
 import io
 import os
+from dotenv import load_dotenv
 from fpdf import FPDF
 import textwrap
 
-openai.api_base = "https://api.openai.eu/v1"  # Gebruik EU endpoint
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Zet je key in een .env bestand of als env var
+# Laad de .env bestand
+load_dotenv()
+
+# Haal de API-sleutel op uit de omgevingsvariabele
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 
@@ -32,13 +36,21 @@ HTML = """
       margin-top: 0.5em;
       padding: 0.4em 1em;
     }
+    input[type="text"], input[type="date"], textarea {
+      width: 300px;  /* Stel de breedte in voor de invoervakken */
+      padding: 8px;
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
 <h1>Genereer je bezwaarschrift</h1>
 <form method=post enctype=multipart/form-data>
-  <label>Naam: <input type=text name=naam required></label><br>
+  <label>Voornaam: <input type=text name=voornaam required></label><br>
+  <label>Achternaam: <input type=text name=achternaam required></label><br>
   <label>Adres: <input type=text name=adres required></label><br>
+  <label>Postcode: <input type=text name=postcode required></label><br>
+  <label>Plaats: <input type=text name=plaats required></label><br>
   <label>Geboortedatum: <input type=date name=geboortedatum required></label><br>
   <label>Wat is er gebeurd? <br><textarea name=gebeurtenis rows=4 cols=50 required></textarea></label><br><br>
   <label>Optionele toelichting: <br><textarea name=toelichting rows=4 cols=50></textarea></label><br><br>
@@ -92,8 +104,11 @@ def generate_bezwaarschrift(gegevens, bestandstekst):
 Je bent een juridisch medewerker. Schrijf een bezwaarschrift aan de gemeente op basis van de volgende informatie:
 
 Persoonsgegevens:
-Naam: {gegevens['naam']}
+Voornaam: {gegevens['voornaam']}
+Achternaam: {gegevens['achternaam']}
 Adres: {gegevens['adres']}
+Postcode: {gegevens['postcode']}
+Plaats: {gegevens['plaats']}
 Geboortedatum: {gegevens['geboortedatum']}
 
 Beschrijving van de gebeurtenis:
@@ -115,22 +130,23 @@ Instructies:
 - Zorg dat het bezwaarschrift duidelijk, formeel en juridisch kloppend is.
 """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt."},
-            {"role": "user", "content": prompt}
-        ]
+    response = openai.Completion.create(
+        model="gpt-4", 
+        prompt=prompt, 
+        max_tokens=1500  # Voeg max_tokens toe om de lengte te beperken
     )
-    return response.choices[0].message.content
+    return response.choices[0].text.strip()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = ""
     if request.method == 'POST':
         gegevens = {
-            'naam': request.form['naam'],
+            'voornaam': request.form['voornaam'],
+            'achternaam': request.form['achternaam'],
             'adres': request.form['adres'],
+            'postcode': request.form['postcode'],
+            'plaats': request.form['plaats'],
             'geboortedatum': request.form['geboortedatum'],
             'gebeurtenis': request.form['gebeurtenis'],
             'toelichting': request.form.get('toelichting', '')
