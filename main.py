@@ -102,7 +102,12 @@ def generate_bezwaarschrift(gegevens, bestandstekst):
         juridische_basis = ""
 
     prompt = f"""
-Je bent een juridisch medewerker. Schrijf een bezwaarschrift aan de gemeente op basis van de volgende informatie:
+Gebruik de volgende juridische bepalingen letterlijk waar relevant. Verwijs ernaar en neem de tekst indien nodig op in het bezwaarschrift:
+
+{juridische_basis}
+
+Je bent een juridisch medewerker. Op basis van onderstaande informatie dien je een juridisch correct en volledig bezwaarschrift op te stellen.
+Gebruik duidelijke alinea's, formele toon, en géén Markdown-opmaak zoals ### of lijsten.
 
 Persoonsgegevens:
 Naam: {gegevens['voornaam']} {gegevens['achternaam']}
@@ -119,21 +124,18 @@ Inhoud van het meegestuurde document:
 Eventuele extra toelichting van de gebruiker:
 {gegevens['toelichting']}
 
-Instructies:
-- Vermeld altijd de datum van het besluit en het kenmerk, indien deze uit het document gehaald kunnen worden.
-- Analyseer relevante wetsartikelen die genoemd worden in het besluit.
-- Reageer inhoudelijk op die wetsartikelen vanuit het perspectief van de indiener.
-- Neem de letterlijke wettekst op in het bezwaarschrift wanneer deze in het besluit of het dossier wordt genoemd.
-- Pas altijd het evenredigheidsbeginsel toe, ook bij schending van de inlichtingenplicht of bij twijfel over betalingsonmacht.
-- Beoordeel expliciet het evenredigheidsbeginsel aan de hand van de drie criteria: geschiktheid, noodzakelijkheid en evenwichtigheid, en geef bij elk criterium een aparte onderbouwing.
-- Controleer of fundamentele rechtsbeginselen zijn geschonden (zoals het zorgvuldigheidsbeginsel, evenredigheidsbeginsel, motiveringsbeginsel).
-- Vermeld expliciet dat de indiener verzoekt om toezending van het volledige dossier.
-- Sluit het bezwaarschrift correct af met de naam van de indiener en ruimte voor handtekening.
-- Zorg dat het bezwaarschrift duidelijk, formeel en juridisch kloppend is.
+Stel nu een bezwaarschrift op waarin je:
+- Altijd de datum en het kenmerk van het besluit noemt indien beschikbaar.
+- Relevante wetsartikelen inhoudelijk analyseert en waar nodig letterlijk opneemt.
+- Het evenredigheidsbeginsel toepast, ook bij schending van de inlichtingenplicht of twijfel over betalingsonmacht.
+- De drie onderdelen van het evenredigheidsbeginsel afzonderlijk bespreekt: geschiktheid, noodzakelijkheid en evenwichtigheid.
+- Eventuele schending van andere rechtsbeginselen benoemt (zorgvuldigheid, motivering, proportionaliteit).
+- Vermeldt dat de indiener het volledige dossier wil ontvangen.
+- Afsluit met naam van de indiener en ruimte voor handtekening.
 
-Hieronder volgt aanvullende juridische achtergrondinformatie:
-{juridische_basis}
+Het bezwaarschrift moet juridisch goed onderbouwd, helder en overtuigend zijn.
 """
+
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
