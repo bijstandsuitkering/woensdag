@@ -102,12 +102,13 @@ def generate_bezwaarschrift(gegevens, bestandstekst):
         juridische_basis = ""
 
     prompt = f"""
-Gebruik de volgende juridische bepalingen letterlijk waar relevant. Verwijs ernaar en neem de tekst indien nodig op in het bezwaarschrift:
+Gebruik de volgende juridische bepalingen letterlijk waar relevant. Verwijs ernaar en neem de volledige tekst indien mogelijk op in het bezwaarschrift. Het eindresultaat moet minimaal 1,5 A4 lang zijn (ongeveer 1000–1200 woorden).
 
 {juridische_basis}
 
-Je bent een juridisch medewerker. Op basis van onderstaande informatie dien je een juridisch correct en volledig bezwaarschrift op te stellen.
-Gebruik duidelijke alinea's, formele toon, en géén Markdown-opmaak zoals ### of lijsten.
+Je bent een juridisch medewerker. Op basis van onderstaande informatie dien je een juridisch correct en volledig bezwaarschrift op te stellen. Gebruik duidelijke alinea's, formele toon, en géén Markdown-opmaak zoals ### of lijsten.
+
+Voer eerst een juridische analyse uit. Onderzoek vervolgens of de genoemde wetsartikelen correct zijn toegepast. Werk daarna pas het bezwaarschrift volledig uit. Geef motivering per artikel.
 
 Persoonsgegevens:
 Naam: {gegevens['voornaam']} {gegevens['achternaam']}
@@ -133,13 +134,13 @@ Stel nu een bezwaarschrift op waarin je:
 - Vermeldt dat de indiener het volledige dossier wil ontvangen.
 - Afsluit met naam van de indiener en ruimte voor handtekening.
 
-Het bezwaarschrift moet juridisch goed onderbouwd, helder en overtuigend zijn.
+Het bezwaarschrift moet juridisch goed onderbouwd, helder, overtuigend en minstens 1,5 A4 lang zijn.
 """
 
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt."},
+            {"role": "system", "content": "Je bent een juridisch assistent die bezwaarschriften opstelt. Je redeneert stap voor stap, gebruikt letterlijke wetteksten waar genoemd, en structureert je antwoord in formele paragrafen. Het eindresultaat is lang, onderbouwd en foutloos."},
             {"role": "user", "content": prompt}
         ]
     )
