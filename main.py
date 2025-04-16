@@ -165,4 +165,4 @@ def download_pdf():
     return send_file(pdf_output, as_attachment=True, download_name="bezwaarschrift.pdf", mimetype='application/pdf')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
